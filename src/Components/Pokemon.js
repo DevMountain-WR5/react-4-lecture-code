@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import axios from 'axios';
 
 class Pokemon extends Component {
     constructor(){
@@ -9,16 +10,38 @@ class Pokemon extends Component {
         }
     }
 
+    componentDidMount(){
+        //sends request to PokeAPI
+        axios.get(`https://pokeapi.co/api/v2/pokemon/${this.state.index}`)
+        .then(res => {
+            //.then contains functionality to handle a successful response
+            this.setState({selectedPokemon: res.data})
+        })
+        .catch(err => console.log(err));
+        //.catch handles a response that contains an error
+    }
+
     nextPokemon = () => {
         // Add code here
+        this.setState({index: this.state.index + 1});
+        axios.get(`https://pokeapi.co/api/v2/pokemon/${this.state.index + 1}`)
+        .then(res => {
+            this.setState({selectedPokemon: res.data})
+        })
+        .catch(err => console.log(err));
     }
 
     previousPokemon = () => {
         const {index} = this.state;
         // Above code also works as this.state.index
 
-        if(index !== 0){
-            //code here
+        if(index !== 1){
+            this.setState({index: this.state.index - 1});
+            axios.get(`https://pokeapi.co/api/v2/pokemon/${this.state.index - 1}`)
+            .then(res => {
+                this.setState({selectedPokemon: res.data})
+            })
+            .catch(err => console.log(err));
         }
     }
 
@@ -31,9 +54,11 @@ class Pokemon extends Component {
                 ? <img src={selectedPokemon.sprites.front_default} alt={selectedPokemon.name}/>
                 : null}
                 <h2>{selectedPokemon.name}</h2>
-                <button>Previous</button>
-                <button>Next</button>
+                <button onClick={this.previousPokemon}>Previous</button>
+                <button onClick={this.nextPokemon}>Next</button>
             </section>
         )
     }
 }
+
+export default Pokemon;
